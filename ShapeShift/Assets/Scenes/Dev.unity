@@ -161,7 +161,7 @@ SpringJoint2D:
   m_Anchor: {x: 0, y: 0}
   m_ConnectedAnchor: {x: 0, y: 0}
   m_AutoConfigureDistance: 0
-  m_Distance: 3.56
+  m_Distance: 3.5
   m_DampingRatio: 0
   m_Frequency: 1
 --- !u!61 &242898984
@@ -297,7 +297,7 @@ Transform:
   m_GameObject: {fileID: 242898982}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -6.34, y: -2.3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -316,6 +316,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   my2DRB: {fileID: 242898985}
+  myState: 0
+  webLine: {fileID: 6495217566512330176, guid: 9ff75c1004a755544baa0a1f1fdf35ee, type: 3}
 --- !u!1 &444535422
 GameObject:
   m_ObjectHideFlags: 0
@@ -488,6 +490,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   my2DRB: {fileID: 444535425}
+  myState: 0
+  webLine: {fileID: 6495217566512330176, guid: 9ff75c1004a755544baa0a1f1fdf35ee, type: 3}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
