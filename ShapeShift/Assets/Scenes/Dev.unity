@@ -318,6 +318,10 @@ MonoBehaviour:
   my2DRB: {fileID: 242898985}
   myState: 0
   webLine: {fileID: 6495217566512330176, guid: 9ff75c1004a755544baa0a1f1fdf35ee, type: 3}
+  mask:
+    serializedVersion: 2
+    m_Bits: 64
+  detectionRadius: 10
 --- !u!1 &444535422
 GameObject:
   m_ObjectHideFlags: 0
@@ -492,6 +496,10 @@ MonoBehaviour:
   my2DRB: {fileID: 444535425}
   myState: 0
   webLine: {fileID: 6495217566512330176, guid: 9ff75c1004a755544baa0a1f1fdf35ee, type: 3}
+  mask:
+    serializedVersion: 2
+    m_Bits: 64
+  detectionRadius: 10
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0

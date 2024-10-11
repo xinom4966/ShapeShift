@@ -98,3 +98,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 0}
+  start: {fileID: 0}
+  myRenderer: {fileID: 3714275734027671453}
+  maxDist: 4

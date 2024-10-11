@@ -8,10 +8,12 @@ public class SpiderBehaviour : MonoBehaviour
     private Vector3 mouseWorldPosition;
     [SerializeField] public SpiderState myState;
     private List<SpringJoint2D> connections = new List<SpringJoint2D>();
-    private Collider2D[] OverlappedSpiders;
+    private List<Collider2D> OverlappedSpiders = new List<Collider2D>();
     private List<GameObject> targets = new List<GameObject>();
     [SerializeField] private GameObject webLine;
     private GameObject webPrediction;
+    [SerializeField] private LayerMask mask;
+    [SerializeField] private float detectionRadius;
 
     private void Start()
     {
@@ -20,6 +22,12 @@ public class SpiderBehaviour : MonoBehaviour
             myState = SpiderState.Locked;
             gameObject.layer = 6;
             connections.Add(_spring);
+
+        }
+        else if (DetectIndirectlyAttachedSpringJoints(1))
+        {
+            myState = SpiderState.Locked;
+            gameObject.layer = 6;
         }
         switch (myState)
         {
@@ -50,16 +58,27 @@ public class SpiderBehaviour : MonoBehaviour
             DestroyConnections();
         }
         myState = SpiderState.Dragging;
+        gameObject.layer = 0;
         transform.position = mouseWorldPosition;
         DetectNearbySpiders();
     }
 
     private void OnMouseUp()
     {
-        /*if (myState == SpiderState.Locked)
+        if (targets.Count > 0)
         {
+            for (int i = 0; i < targets.Count; i++)
+            {
+                SpringJoint2D newSpring = gameObject.AddComponent(typeof(SpringJoint2D)) as SpringJoint2D;
+                newSpring.connectedBody = targets[i].GetComponent<Rigidbody2D>();
+            }
+            myState = SpiderState.Locked;
             my2DRB.gravityScale = 0f;
-        }*/
+            return;
+        }
+        myState = SpiderState.Free;
+        my2DRB.gravityScale = 1f;
+        return;
     }
 
     private void DestroyConnections()
@@ -76,27 +95,28 @@ public class SpiderBehaviour : MonoBehaviour
 
     private void DetectNearbySpiders()
     {
-        OverlappedSpiders = Physics2D.OverlapCircleAll(transform.position, 7f, LayerMask.GetMask("LockedSpider"));
-        if (OverlappedSpiders.Length >= 1)
+        OverlappedSpiders = Physics2D.OverlapCircleAll(transform.position, detectionRadius, mask).ToList();
+        if (OverlappedSpiders.Count >= 1)
         {
-            for (int i=0; i<OverlappedSpiders.Length; i++)
+            for (int i=0; i<OverlappedSpiders.Count; i++)
             {
                 if (!targets.Contains(OverlappedSpiders[i].gameObject))
                 {
                     targets.Add(OverlappedSpiders[i].gameObject);
-                    webPrediction = Instantiate(webLine, transform.position, Quaternion.identity, transform);
+                    webPrediction = Instantiate(webLine, transform.position, Quaternion.identity);
                     webPrediction.GetComponent<WebPrediction>().target = OverlappedSpiders[i].gameObject.transform;
+                    webPrediction.GetComponent<WebPrediction>().start = transform;
                 }
             }
         }
     }
 
-    private void DetectIndirectlyAttachedSpringJoints(int _instruction)
+    private bool DetectIndirectlyAttachedSpringJoints(int _instruction)
     {
-        OverlappedSpiders = Physics2D.OverlapCircleAll(transform.position, 7f, LayerMask.GetMask("LockedSpider"));
-        if (OverlappedSpiders.Length >= 1)
+        OverlappedSpiders = Physics2D.OverlapCircleAll(transform.position, detectionRadius, mask).ToList();
+        if (OverlappedSpiders.Count >= 1)
         {
-            for (int i = 0; i < OverlappedSpiders.Length; i++)
+            for (int i = 0; i < OverlappedSpiders.Count; i++)
             {
                 if (OverlappedSpiders[i].gameObject.TryGetComponent<SpringJoint2D>(out SpringJoint2D _targetSpring))
                 {
@@ -108,16 +128,19 @@ public class SpiderBehaviour : MonoBehaviour
                                 Destroy(_targetSpring);
                                 break;
                             case 1:
+                                connections.Add(_targetSpring);
                                 break;
                             case 2:
                                 break;
                             default:
                                 break;
                         }
+                        return true;
                     }
                 }
             }
         }
+        return false;
     }
 
     public enum SpiderState
