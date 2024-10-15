@@ -12,8 +12,11 @@ public class SpiderBehaviour : MonoBehaviour
     private List<GameObject> targets = new List<GameObject>();
     [SerializeField] private GameObject webLine;
     private GameObject webPrediction;
+    private List<GameObject> allPreviews = new List<GameObject>();
     [SerializeField] private LayerMask mask;
     [SerializeField] private float detectionRadius;
+    [SerializeField] private GameObject connectionPrefab;
+    private GameObject connectionLine;
 
     private void Start()
     {
@@ -74,29 +77,31 @@ public class SpiderBehaviour : MonoBehaviour
             {
                 SpringJoint2D newSpring = gameObject.AddComponent(typeof(SpringJoint2D)) as SpringJoint2D;
                 newSpring.connectedBody = targets[i].GetComponent<Rigidbody2D>();
+                AddConnection(newSpring);
                 targets[i].GetComponent<SpiderBehaviour>().AddConnection(newSpring);
+                connectionLine = Instantiate(connectionPrefab, transform.position, Quaternion.identity);
+                connectionLine.GetComponent<WebBehaviour>().end1 = gameObject;
+                connectionLine.GetComponent<WebBehaviour>().end2 = targets[i];
             }
             myState = SpiderState.Locked;
             my2DRB.gravityScale = 0f;
-            Destroy(webPrediction);
+            gameObject.layer = 6;
+            DestroyAllPreviews();
             return;
         }
         myState = SpiderState.Free;
         my2DRB.gravityScale = 1f;
-        Destroy(webPrediction);
+        DestroyAllPreviews();
         return;
     }
 
     private void DestroyConnections()
     {
-        for (int i = 0; i < connections.Count; i++)
+        foreach (SpringJoint2D connection in connections)
         {
-            if (connections[i] != null)
-            {
-                Destroy(connections[i]);
-                RemoveInConnectionList(i);
-            }
+            Destroy(connection);
         }
+        connections.Clear();
         DetectIndirectlyAttachedSpringJoints(0);
     }
 
@@ -110,9 +115,13 @@ public class SpiderBehaviour : MonoBehaviour
                 if (!targets.Contains(OverlappedSpiders[i].gameObject))
                 {
                     targets.Add(OverlappedSpiders[i].gameObject);
-                    webPrediction = Instantiate(webLine, transform.position, Quaternion.identity);
-                    webPrediction.GetComponent<WebPrediction>().target = OverlappedSpiders[i].gameObject.transform;
-                    webPrediction.GetComponent<WebPrediction>().start = transform;
+                    if (!SearchForPreview(OverlappedSpiders[i].gameObject))
+                    {
+                        webPrediction = Instantiate(webLine, transform.position, Quaternion.identity);
+                        webPrediction.GetComponent<WebPrediction>().target = OverlappedSpiders[i].gameObject;
+                        webPrediction.GetComponent<WebPrediction>().start = gameObject;
+                        allPreviews.Add(webPrediction);
+                    }
                 }
             }
         }
@@ -129,7 +138,6 @@ public class SpiderBehaviour : MonoBehaviour
     {
         bool result = false;
         OverlappedSpiders = Physics2D.OverlapCircleAll(transform.position, detectionRadius, mask).ToList();
-        Debug.Log(OverlappedSpiders.Count);
         if (OverlappedSpiders.Count >= 1)
         {
             for (int i = 0; i < OverlappedSpiders.Count; i++)
@@ -169,7 +177,7 @@ public class SpiderBehaviour : MonoBehaviour
         {
             myState = SpiderState.Free;
             my2DRB.gravityScale = 1.0f;
-            //gameObject.layer = 0;
+            gameObject.layer = 0;
         }
     }
 
@@ -194,6 +202,32 @@ public class SpiderBehaviour : MonoBehaviour
         {
             connections.RemoveAt(index);
         }
+    }
+
+    private void DestroyAllPreviews()
+    {
+        foreach (GameObject element in allPreviews)
+        {
+            Destroy(element);
+        }
+        allPreviews.Clear();
+    }
+
+    private bool SearchForPreview(GameObject _targetObject)
+    {
+        for (int i = 0; i <allPreviews.Count; i++)
+        {
+           if (allPreviews[i].GetComponent<WebPrediction>().target == _targetObject)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void SetUpVisuals()
+    {
+
     }
 
     public enum SpiderState
