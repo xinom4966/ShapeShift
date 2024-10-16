@@ -27,6 +27,7 @@ public class SpiderBehaviour : MonoBehaviour
             foreach (SpringJoint2D spring in gameObject.GetComponents<SpringJoint2D>())
             {
                 connections.Add(spring);
+                SetUpVisuals(spring.connectedBody.gameObject, spring);
             }
         }
         if (DetectIndirectlyAttachedSpringJoints(1))
@@ -79,9 +80,7 @@ public class SpiderBehaviour : MonoBehaviour
                 newSpring.connectedBody = targets[i].GetComponent<Rigidbody2D>();
                 AddConnection(newSpring);
                 targets[i].GetComponent<SpiderBehaviour>().AddConnection(newSpring);
-                connectionLine = Instantiate(connectionPrefab, transform.position, Quaternion.identity);
-                connectionLine.GetComponent<WebBehaviour>().end1 = gameObject;
-                connectionLine.GetComponent<WebBehaviour>().end2 = targets[i];
+                SetUpVisuals(targets[i], newSpring);
             }
             myState = SpiderState.Locked;
             my2DRB.gravityScale = 0f;
@@ -225,9 +224,12 @@ public class SpiderBehaviour : MonoBehaviour
         return false;
     }
 
-    private void SetUpVisuals()
+    private void SetUpVisuals(GameObject _targetObject, SpringJoint2D _spring)
     {
-
+        connectionLine = Instantiate(connectionPrefab, Vector3.zero, Quaternion.identity);
+        connectionLine.GetComponent<WebBehaviour>().end1 = gameObject;
+        connectionLine.GetComponent<WebBehaviour>().end2 = _targetObject;
+        connectionLine.GetComponent<WebBehaviour>().spring = _spring;
     }
 
     public enum SpiderState
