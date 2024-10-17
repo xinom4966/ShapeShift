@@ -60,6 +60,7 @@ public class SpiderBehaviour : MonoBehaviour
 
     private void OnMouseDrag()
     {
+        gameObject.GetComponent<BoxCollider2D>().enabled = false;
         if (myState == SpiderState.Locked)
         {
             DestroyConnections();
@@ -72,6 +73,8 @@ public class SpiderBehaviour : MonoBehaviour
 
     private void OnMouseUp()
     {
+        gameObject.GetComponent<BoxCollider2D>().enabled = true;
+        my2DRB.velocity = Vector3.zero;
         if (targets.Count > 0)
         {
             for (int i = 0; i < targets.Count; i++)
@@ -94,7 +97,7 @@ public class SpiderBehaviour : MonoBehaviour
         return;
     }
 
-    private void DestroyConnections()
+    public void DestroyConnections()
     {
         foreach (SpringJoint2D connection in connections)
         {
