@@ -180,3 +180,4 @@ MonoBehaviour:
     m_Bits: 64
   detectionRadius: 3.5
   connectionPrefab: {fileID: 3117727861946035881, guid: 9d217b93b3541494ebd2c89ddd03ad17, type: 3}
+  myRenderer: {fileID: 336282362763790493}

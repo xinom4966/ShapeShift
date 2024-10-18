@@ -20,4 +20,9 @@ public class FinishLine : MonoBehaviour
             }
         }
     }
+
+    public void Quit()
+    {
+        Application.Quit();
+    }
 }
